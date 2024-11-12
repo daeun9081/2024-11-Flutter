@@ -80,7 +80,8 @@ class _MyListState extends State<MyList> {
                 child: ListView.builder(
                     itemCount: listManager.todayTasks.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
+                      return Card(
+                          child: ListTile(
                         leading: const Icon(Icons.star),
                         title: Text(listManager.todayTasks[index]),
                         trailing: IconButton(
@@ -90,7 +91,7 @@ class _MyListState extends State<MyList> {
                                 listManager.completeTask(index);
                               });
                             }),
-                      );
+                      ));
                     })),
             const Padding(
               padding: EdgeInsets.all(8.0),
