@@ -12,10 +12,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ListView',
-      /*theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),*/
       home: const MyList(title: 'ListView Test'),
     );
   }
@@ -30,8 +26,41 @@ class MyList extends StatefulWidget {
   State<MyList> createState() => _MyListState();
 }
 
+class ListManager {
+  final List<String> todayTasks = ["테스트1", "테스트2", "테스트3"];
+  final List<String> completedTasks = ["테스트4", "테스트5"];
+
+  void addTodayTask(String task) {
+    todayTasks.add(task);
+  }
+
+  void addCompletedTask(String task) {
+    completedTasks.add(task);
+  }
+
+  String completeTask(int index) {
+    if (index < todayTasks.length) {
+      final task = todayTasks.removeAt(index);
+      completedTasks.add(task);
+      return task;
+    }
+    return "";
+  }
+
+  String undoCompleteTask(int index) {
+    if (index < completedTasks.length) {
+      final task = completedTasks.removeAt(index);
+      todayTasks.add(task);
+      return task;
+    }
+    return "";
+  }
+}
+
 class _MyListState extends State<MyList> {
   //마이리스트 상태 관리
+  final ListManager listManager = ListManager();
+  int newNumber = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +78,18 @@ class _MyListState extends State<MyList> {
             ),
             Expanded(
                 child: ListView.builder(
-                    itemCount: 5,
+                    itemCount: listManager.todayTasks.length,
                     itemBuilder: (context, index) {
                       return ListTile(
                         leading: const Icon(Icons.star),
-                        title: Text('Item $index'),
+                        title: Text(listManager.todayTasks[index]),
+                        trailing: IconButton(
+                            icon: const Icon(Icons.check),
+                            onPressed: () {
+                              setState(() {
+                                listManager.completeTask(index);
+                              });
+                            }),
                       );
                     })),
             const Padding(
@@ -62,15 +98,32 @@ class _MyListState extends State<MyList> {
             ),
             Expanded(
                 child: ListView.builder(
-                    itemCount: 5,
+                    itemCount: listManager.completedTasks.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        leading: const Icon(Icons.star),
-                        title: Text('New $index'),
+                        leading: const Icon(Icons.check_circle),
+                        title: Text(listManager.completedTasks[index]),
+                        trailing: IconButton(
+                            icon: const Icon(Icons.undo),
+                            onPressed: () {
+                              setState(() {
+                                listManager.undoCompleteTask(index);
+                              });
+                            }),
                       );
                     }))
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            listManager.addTodayTask("새로운 할일 ${newNumber + 1}");
+            newNumber += 1;
+          });
+        },
+        tooltip: "Add Task",
+        child: const Icon(Icons.add),
       ),
     );
   }
